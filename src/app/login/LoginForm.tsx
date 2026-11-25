@@ -6,7 +6,8 @@ import { recordSignupConsent } from '@/actions/account';
 
 export function LoginForm({ next }: { next: string }) {
   const sb = createClient();
-  const [mode, setMode] = useState<'email' | 'phone'>('email');
+  const [mode, setMode] = useState<'email' | 'phone' | 'password'>('email');
+  const [password, setPassword] = useState('');
   const [id, setId] = useState('');
   const [code, setCode] = useState('');
   const [sent, setSent] = useState(false);
@@ -35,6 +36,13 @@ export function LoginForm({ next }: { next: string }) {
     await recordSignupConsent({ marketing, whatsapp });
     window.location.href = next;
   }
+  async function passwordLogin(e: React.FormEvent) {
+    e.preventDefault(); setErr(''); setBusy(true);
+    const { error } = await sb.auth.signInWithPassword({ email: id.trim(), password });
+    if (error) { setBusy(false); setErr(error.message === 'Invalid login credentials' ? 'Wrong email or password' : error.message); return; }
+    window.location.href = next;
+  }
+
   async function google() {
     if (!agree) { setErr('Please accept the Terms and Privacy Policy'); return; }
     await sb.auth.signInWithOAuth({
@@ -57,13 +65,21 @@ export function LoginForm({ next }: { next: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 rounded-lg bg-zinc-100 p-1 text-sm">
-        {(['email', 'phone'] as const).map((m) => (
-          <button key={m} type="button" onClick={() => { setMode(m); setId(''); }} className={`rounded-md py-1.5 font-medium ${mode === m ? 'bg-white shadow-sm' : 'text-zinc-500'}`}>
-            {m === 'email' ? 'Email' : 'Mobile'}
+      <div className="grid grid-cols-3 rounded-lg bg-zinc-100 p-1 text-sm">
+        {(['email', 'phone', 'password'] as const).map((m) => (
+          <button key={m} type="button" onClick={() => { setMode(m); setId(''); setErr(''); }} className={`rounded-md py-1.5 font-medium ${mode === m ? 'bg-white shadow-sm' : 'text-zinc-500'}`}>
+            {m === 'email' ? 'Email code' : m === 'phone' ? 'Mobile' : 'Password'}
           </button>
         ))}
       </div>
+      {mode === 'password' ? (
+        <form onSubmit={passwordLogin} className="space-y-3">
+          <input className="input" type="email" placeholder="you@example.com" value={id} onChange={(e) => setId(e.target.value)} required autoComplete="username" />
+          <input className="input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
+          {err && <p className="text-sm text-red-600">{err}</p>}
+          <button className="btn-dark w-full" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+        </form>
+      ) : (
       <form onSubmit={send} className="space-y-3">
         {mode === 'email'
           ? <input className="input" type="email" placeholder="you@example.com" value={id} onChange={(e) => setId(e.target.value)} required />
@@ -81,6 +97,7 @@ export function LoginForm({ next }: { next: string }) {
         {err && <p className="text-sm text-red-600">{err}</p>}
         <button className="btn-dark w-full" disabled={busy || !agree}>{busy ? 'Sending…' : 'Send code'}</button>
       </form>
+      )}
       <div className="relative text-center text-xs text-zinc-400"><span className="bg-white px-2">or</span></div>
       <button type="button" onClick={google} className="btn-outline w-full">Continue with Google</button>
     </div>
