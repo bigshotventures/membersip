@@ -81,7 +81,7 @@ For local webhooks, use `ngrok http 3000` and point Razorpay, Mux and Zoom at th
 
 1. Push this folder to a GitHub repo and import it in Vercel.
 2. Add all env vars from `.env.example`, with `NEXT_PUBLIC_APP_URL=https://yourdomain.com`, and add a random `CRON_SECRET`.
-3. Add your domain. Use the **Pro plan**, because `vercel.json` runs scheduled jobs every 5 minutes (reminders, scheduled posts, gifts, sequences), every hour (dunning, pauses, win-back, drip alerts) and daily (badges, anniversaries). Hobby only allows daily crons.
+3. Add your domain. `vercel.json` ships with **once-a-day** schedules so it deploys on the Hobby plan. On **Pro**, change the schedules to `*/5 * * * *` (frequent: live reminders, scheduled posts, gifts, sequences) and `7 * * * *` (hourly: dunning, pauses, win-back, drip alerts) so reminders go out on time.
 4. Set the Supabase Site URL and redirect URLs to the production domain.
 
 ## 5. Launch checklist

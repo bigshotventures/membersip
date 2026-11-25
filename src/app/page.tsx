@@ -5,7 +5,7 @@ import { admin } from '@/lib/supabase/admin';
 import { APP_NAME } from '@/lib/utils';
 import { Avatar } from '@/components/ui';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 const FEATURES = [
   ['Memberships', 'Monthly, quarterly, yearly and lifetime tiers with UPI Autopay, trials, coupons and gift cards.'],
