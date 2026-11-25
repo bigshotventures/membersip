@@ -15,6 +15,6 @@ export async function loadCreatorPage(slug: string) {
   return { creator, profile, perms, membership, isMember };
 }
 
-export function accentStyle(creator: { theme?: any }) {
+export function accentStyle(creator: any) {
   return { ['--accent' as any]: creator.theme?.accent || '#7c3aed' } as CSSProperties;
 }
